@@ -144,6 +144,9 @@ section[id] { scroll-margin-top: 80px; }
 .qadd svg { width: 22px; height: 22px; }
 .qadd:hover { background: var(--accent); color: var(--accent-ink); transform: scale(1.12) rotate(90deg); }
 .qadd.done { background: var(--leaf); color: #fff; }
+.qadd .ck { display: none; stroke-dasharray: 24; stroke-dashoffset: 24; }
+.qadd.done .pl { display: none; } .qadd.done .ck { display: block; animation: ckdraw .35s ease forwards; } .qadd.done:hover { transform: scale(1.08); }
+@keyframes ckdraw { to { stroke-dashoffset: 0; } }
 
 .art.full img { object-fit: contain; object-position: 50% 50%; }
 .pd .art.full { aspect-ratio: 1 / 1; transition: none; }
@@ -242,6 +245,8 @@ section[id] { scroll-margin-top: 80px; }
 .fb { display: inline-flex; align-items: center; gap: 8px; color: #fff; text-decoration: none; border-radius: 999px; padding: 10px 20px; font-weight: 700; font-size: 15px; transition: transform .15s, filter .2s; }
 .fb svg { width: 20px; height: 20px; fill: currentColor; }
 .fb:hover { filter: brightness(1.1); transform: translateY(-2px); }
+.ship-note { display: flex; align-items: center; gap: 8px; margin: 14px 0 0; color: var(--muted); font-size: 14px; font-weight: 700; } .ship-note svg { width: 22px; height: 22px; color: var(--accent); flex: none; }
+.wa-btn { background: #1FA855; color: #fff; width: 100%; margin-top: 12px; } .wa-btn .wai { width: 22px; height: 22px; } .wa-btn[aria-disabled="true"] { opacity: .45; pointer-events: none; } .wa-p { width: auto; }
 .fb.wa-chat { background: #1FA855; } .fb.ig { background: linear-gradient(45deg, #F9A12C, #E1306C 55%, #833AB4); } .fb.fbk { background: #1877F2; }
 
 /* Cart drawer */
@@ -520,7 +525,7 @@ img { decoding: async; }
       <div class="deliver" id="deliver"></div>
       <div class="sum" id="sum"></div>
       <div class="total"><span>إجمالي المنتجات</span><span><b id="total">0</b> ج.م</span></div>
-      <p class="note">إتمام الطلب هيتفعّل قريبًا. تقدري تجهّزي سلتك من دلوقتي.</p>
+      <a class="btn wa-btn" id="cartWa" href="#" target="_blank" rel="noopener"><svg viewBox="0 0 24 24" aria-hidden="true" class="wai"><path fill="currentColor" d="M12.04 2a9.9 9.9 0 0 0-8.5 14.9L2 22l5.25-1.38A9.9 9.9 0 1 0 12.04 2Zm0 1.8a8.1 8.1 0 1 1-4.2 15l-.3-.18-3.1.82.83-3.03-.2-.31A8.1 8.1 0 0 1 12.04 3.8Zm-3 3.9c-.2 0-.52.07-.8.37-.27.3-1.04 1.02-1.04 2.5s1.07 2.9 1.22 3.1c.15.2 2.1 3.2 5.08 4.48 2.5 1.08 3 .87 3.54.82.54-.05 1.74-.71 1.98-1.4.25-.7.25-1.3.17-1.42-.07-.12-.27-.2-.57-.35-.3-.15-1.74-.86-2.01-.96-.27-.1-.47-.15-.67.15-.2.3-.77.96-.94 1.16-.17.2-.35.22-.65.07-.3-.15-1.26-.46-2.4-1.48-.89-.79-1.49-1.77-1.66-2.07-.17-.3-.02-.46.13-.6.13-.14.3-.35.45-.52.15-.18.2-.3.3-.5.1-.2.05-.37-.02-.52-.08-.15-.67-1.62-.92-2.22-.24-.58-.49-.5-.67-.51h-.57Z"/></svg> تأكيد الطلب عبر واتساب</a>
     </div>
   </aside>
 </div>
@@ -528,11 +533,14 @@ img { decoding: async; }
 <script>
 /* ---- عدّلي هنا ---- */
 var BRAND = "عيشها كروشيه";
-var WA_NUMBER = "";          // اكتبي رقم واتساب بالصيغة الدولية بدون + (مثال 2010xxxxxxxx)، أو سيبيه فاضي
+var ICON_WA = '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12.04 2a9.9 9.9 0 0 0-8.5 14.9L2 22l5.25-1.38A9.9 9.9 0 1 0 12.04 2Zm0 1.8a8.1 8.1 0 1 1-4.2 15l-.3-.18-3.1.82.83-3.03-.2-.31A8.1 8.1 0 0 1 12.04 3.8Zm-3 3.9c-.2 0-.52.07-.8.37-.27.3-1.04 1.02-1.04 2.5s1.07 2.9 1.22 3.1c.15.2 2.1 3.2 5.08 4.48 2.5 1.08 3 .87 3.54.82.54-.05 1.74-.71 1.98-1.4.25-.7.25-1.3.17-1.42-.07-.12-.27-.2-.57-.35-.3-.15-1.74-.86-2.01-.96-.27-.1-.47-.15-.67.15-.2.3-.77.96-.94 1.16-.17.2-.35.22-.65.07-.3-.15-1.26-.46-2.4-1.48-.89-.79-1.49-1.77-1.66-2.07-.17-.3-.02-.46.13-.6.13-.14.3-.35.45-.52.15-.18.2-.3.3-.5.1-.2.05-.37-.02-.52-.08-.15-.67-1.62-.92-2.22-.24-.58-.49-.5-.67-.51h-.57Z"/></svg>';
+var ICON_IG = '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M7.5 2h9A5.5 5.5 0 0 1 22 7.5v9a5.5 5.5 0 0 1-5.5 5.5h-9A5.5 5.5 0 0 1 2 16.5v-9A5.5 5.5 0 0 1 7.5 2Zm0 1.8A3.7 3.7 0 0 0 3.8 7.5v9a3.7 3.7 0 0 0 3.7 3.7h9a3.7 3.7 0 0 0 3.7-3.7v-9a3.7 3.7 0 0 0-3.7-3.7h-9ZM12 6.9a5.1 5.1 0 1 1 0 10.2 5.1 5.1 0 0 1 0-10.2Zm0 1.8a3.3 3.3 0 1 0 0 6.6 3.3 3.3 0 0 0 0-6.6Zm5.3-2.6a1.2 1.2 0 1 1 0 2.4 1.2 1.2 0 0 1 0-2.4Z"/></svg>';
+var ICON_FB = '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M13.5 22v-8.2h2.8l.5-3.3h-3.3V8.4c0-.95.35-1.6 1.7-1.6h1.7V3.9c-.3-.04-1.3-.13-2.5-.13-2.5 0-4.2 1.5-4.2 4.3v2.4H7.4v3.3h2.8V22h3.3Z"/></svg>';
+var WA_NUMBER = "201112607577";          // اكتبي رقم واتساب بالصيغة الدولية بدون + (مثال 2010xxxxxxxx)، أو سيبيه فاضي
 var CURRENCY = "ج.م";
 var SHIPPING_NOTE = "تُحدد عند الطلب";
-var FACEBOOK_URL = "";       // رابط صفحة فيسبوك
-var INSTAGRAM_URL = "";      // رابط إنستجرام
+var FACEBOOK_URL = "https://www.facebook.com/share/g/1Dr9aL6zwk/";       // رابط صفحة فيسبوك
+var INSTAGRAM_URL = "https://www.instagram.com/3eshha_croshet";      // رابط إنستجرام
 var CLOCK_IMGS = ["imgClock1", "imgClock2", "imgClock3"].map(function (i) { return document.getElementById(i).getAttribute("src"); });
 var CLOCK_POS = ["50% 55%", "53% 30%", "94% 30%"];
 var ROSE_IMG = document.getElementById("imgRose").getAttribute("src");
@@ -644,7 +652,7 @@ function cardHTML(p) {
   var c = catOf(p.cat);
   return '<div class="card"><a class="card-link" href="#p-' + p.id + '"><div class="art bg-' + c.bg + (hasPhoto(p) ? ' full' : '') + '">' + artHTML(p) + (p.badge ? '<span class="badge' + (p.isNew ? ' new' : '') + '">' + p.badge + '</span>' : '') + '</div>' +
     '<div class="card-body"><span class="card-cat">' + c.label + '</span><h3>' + p.name + '</h3><div class="price">' + fmt(p.price) + '<small>' + CURRENCY + '</small></div></div></a>' +
-    '<a class="qadd" href="#p-' + p.id + '" aria-label="اختاري اللون وأضيفي ' + p.name + ' للسلة"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round"><path d="M12 5v14M5 12h14"/></svg></a></div>';
+    '<button type="button" class="qadd" data-add="' + p.id + (hasColors(p) ? "~0" : "") + '" aria-label="أضيفي ' + p.name + ' للسلة"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round"><path class="pl" d="M12 5v14M5 12h14"/><path class="ck" d="M5.5 12.5l4.5 4.5 8.5-9.5"/></svg></button></div>';
 }
 function renderHome() {
   $("#bubbles").innerHTML = CATS.map(function (c) {
@@ -669,8 +677,14 @@ function renderCategory(c) {
 
 /* product page */
 var curProd = null, selColor = 0, customHex = "#E0168E", selQty = 1, shown = [], curIdx = 0, colorTok = 0;
+function colorText(p, ci) { var c = colorAt(p, ci); return typeof ci === "string" ? c.n + " " + ci.toUpperCase() : c.n; }
+function cartMsg() {
+  var keys = Object.keys(cart), tt = totals();
+  var ls = keys.map(function (k) { var o = parseKey(k); return "- " + o.p.name + (o.ci !== -1 ? " (" + colorText(o.p, o.ci) + ")" : "") + " × " + cart[k] + " = " + fmt(o.p.price * cart[k]) + " " + CURRENCY; }).join("\n");
+  return "أهلاً " + BRAND + "، حابّة أطلب:\n" + ls + "\n\nإجمالي المنتجات: " + fmt(tt.t) + " " + CURRENCY + "\nمصاريف الشحن: " + SHIPPING_NOTE + whoText();
+}
 function productMsg(p, ci, q) {
-  var lab = ci !== -1 ? " (" + colorAt(p, ci).n + ")" : "";
+  var lab = ci !== -1 ? " (" + colorText(p, ci) + ")" : "";
   return "أهلاً " + BRAND + "، حابّة أطلب:\n- " + p.name + lab + " × " + q + " = " + fmt(p.price * q) + " " + CURRENCY + "\n\nمصاريف الشحن: " + SHIPPING_NOTE + whoText();
 }
 function renderProduct(p) {
@@ -687,9 +701,10 @@ function renderProduct(p) {
     '<p class="pd-desc">' + p.desc + '</p><ul class="feats">' + p.feats.map(function (f) { return "<li>" + f + "</li>"; }).join("") + '</ul>' + sw +
     '<div class="pd-buy"><div class="qty"><button type="button" data-q="-1" aria-label="تقليل">−</button><span id="pq">' + selQty + '</span><button type="button" data-q="1" aria-label="زيادة">+</button></div>' +
     '<button type="button" class="btn btn-solid" id="pAdd">أضيفي للسلة</button></div>' +
+    '<p class="ship-note"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 7h11v9H3zM14 10h4l3 3v3h-7"/><circle cx="7" cy="17.5" r="1.6"/><circle cx="17" cy="17.5" r="1.6"/></svg>مصاريف الشحن تُحدد عند الطلب</p>' +
     '</div></div></div>' +
     (rel.length ? '<div class="wrap"><section class="sec"><h2>من نفس <b>القسم</b></h2><div class="grid">' + rel.map(cardHTML).join("") + '</div></section></div>' : "");
-  shown = p.imgs ? p.imgs.slice() : []; curIdx = 0;
+  shown = p.imgs ? p.imgs.slice() : []; curIdx = 0; { var pw0 = $("#pWa"); if (pw0) pw0.href = waLink(productMsg(p, useC ? (selColor === -2 ? customHex : selColor) : -1, selQty)); }
   if (selColor > 0) applyColor();
 }
 /* recolor the yarn: SVG art via CSS variables, photos via a hue-shift on the yarn pixels */
@@ -752,6 +767,7 @@ function applyColor() {
 function waLink(msg) { return "https://wa.me/" + WA_NUMBER + "?text=" + encodeURIComponent(msg); }
 function refreshBuy() {
   if (!curProd) return; var useC = hasColors(curProd);
+  var pw = $("#pWa"); if (pw) pw.href = waLink(productMsg(curProd, useC ? (selColor === -2 ? customHex : selColor) : -1, selQty));
   $("#pq").textContent = selQty;
   if (useC) { var cc0 = curCol(); $("#swName").innerHTML = selColor === -2 ? cc0.n + " <bdi dir=\"ltr\">" + customHex.toUpperCase() + "</bdi>" : cc0.n; applyColor(); $$(".sw[data-sw]").forEach(function (b) { b.setAttribute("aria-pressed", String(+b.dataset.sw === selColor)); }); var sc = $("#swCustom"); if (sc) { sc.classList.toggle("on", selColor === -2); sc.style.setProperty("--cc", selColor === -2 ? customHex : "transparent"); } }
 }
@@ -776,6 +792,7 @@ function renderCart(keepLines) {
         '<button type="button" class="rm" data-rm="' + k + '">حذف</button></div>';
     }).join("");
   }
+  var cw = $("#cartWa"); if (cw) { cw.href = keys.length ? waLink(cartMsg()) : "#"; cw.setAttribute("aria-disabled", String(!keys.length)); }
   renderDeliver(); persist();
 }
 function addToCart(key, btn, q) {
@@ -991,8 +1008,9 @@ window.addEventListener("resize", function () { fitBar(); calcMax(); }); window.
 if (window.ResizeObserver) new ResizeObserver(function () { calcMax(); fitBar(); }).observe(document.documentElement);
 
 var social = "";
-if (FACEBOOK_URL) social += '<a class="fb fbk" href="' + FACEBOOK_URL + '" target="_blank" rel="noopener">فيسبوك</a>';
-if (INSTAGRAM_URL) social += '<a class="fb ig" href="' + INSTAGRAM_URL + '" target="_blank" rel="noopener">إنستجرام</a>';
+if (WA_NUMBER) social += '<a class="fb wa-chat" href="https://wa.me/' + WA_NUMBER + '" target="_blank" rel="noopener">' + ICON_WA + 'واتساب</a>';
+if (INSTAGRAM_URL) social += '<a class="fb ig" href="' + INSTAGRAM_URL + '" target="_blank" rel="noopener">' + ICON_IG + 'إنستجرام</a>';
+if (FACEBOOK_URL) social += '<a class="fb fbk" href="' + FACEBOOK_URL + '" target="_blank" rel="noopener">' + ICON_FB + 'فيسبوك</a>';
 $("#footBtns").insertAdjacentHTML("beforeend", social);
 
 renderHome(); renderAcct(); renderCart(); buildYarn(); fitBar();
